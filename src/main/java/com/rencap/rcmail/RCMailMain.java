@@ -20,6 +20,7 @@ import javax.xml.transform.stream.*;
 import java.net.URI;
 import java.util.Properties;
 import javax.mail.Session;
+import javax.mail.Store;
 
 public class RCMailMain {
     public static String nodeToString(Node node) throws TransformerException {
@@ -155,5 +156,6 @@ public class RCMailMain {
         Session session = Session.getInstance(props);
         Store store = session.getStore("smtps");
         store.connect("outlook.office365.com", 993, "SvcEmail@rencap.com", "JNVK28ekcs");
+        return "1";
     }
 }
