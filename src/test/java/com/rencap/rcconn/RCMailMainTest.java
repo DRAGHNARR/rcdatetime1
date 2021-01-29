@@ -26,21 +26,25 @@ public class RCMailMainTest {
         table.appendChild(tr1);
         Element tr2 = doc.createElement("tr");
         table.appendChild(tr2);
+        Element tr3 = doc.createElement("tr");
+        table.appendChild(tr3);
+        Element tr4 = doc.createElement("tr");
+        table.appendChild(tr4);
         Element td1 = doc.createElement("td");
         tr1.appendChild(td1);
         Element td2 = doc.createElement("td");
-        tr1.appendChild(td2);
+        tr2.appendChild(td2);
         Element td3 = doc.createElement("td");
-        tr2.appendChild(td3);
+        tr3.appendChild(td3);
         Element td4 = doc.createElement("td");
-        tr2.appendChild(td4);
+        tr4.appendChild(td4);
 
-        td1.appendChild(doc.createTextNode("Hi there!"));
-        td2.appendChild(doc.createTextNode("Hi there!"));
-        td3.appendChild(doc.createTextNode("Hi there!"));
-        td4.appendChild(doc.createTextNode("Hi there!"));
+        td1.appendChild(doc.createTextNode("test"));
+        td2.appendChild(doc.createTextNode("test"));
+        td3.appendChild(doc.createTextNode("test"));
+        td4.appendChild(doc.createTextNode("test"));
 
-        String result = RCMailMain.send("SvcEmail@rencap.com", "JNVK28ekcs", "dkochnev@rencap.com", "test", root);
-        Assert.assertEquals("sended", result);
+        String result = RCMailMain.sendСсAttach("dkochnev@rencap.com", "dkochnev@rencap.com", "123", root, "pom.xml");
+        Assert.assertEquals("sent", result);
     }
 }
