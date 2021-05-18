@@ -1,5 +1,6 @@
 package com.rencap.rcmail;
 
+import com.rencap.rcexec.RCExecMain;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
@@ -23,7 +24,8 @@ import javax.xml.transform.stream.*;
 import java.net.URI;
 import java.util.Properties;
 
-public class RCMailMain {
+public class RCMailMain  {
+
     public static String nodeToString(Node node) throws TransformerException {
         StringWriter writer = new StringWriter();
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -34,7 +36,7 @@ public class RCMailMain {
     public static String send(String to, String subject, Node body) throws Exception {
         ExchangeService service = new ExchangeService();
         service.setTraceEnabled(true);
-        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", "JNVK28ekcs");
+        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", RCExecMain.exec("pass email/SvcEmail@rencap.com"));
         service.setCredentials(creds);
         //service.autodiscoverUrl("SvcEmail@rencap.com");
         //service.setTraceEnabled(true);
@@ -68,10 +70,14 @@ public class RCMailMain {
         return "sended";
     }
 
+    public static String testPass() throws IOException, InterruptedException {
+        return RCExecMain.exec("pass svcEmail");
+    }
+
     public static String sendAttach(String to, String subject, Node body, String attach) throws Exception {
         ExchangeService service = new ExchangeService();
         service.setTraceEnabled(true);
-        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", "JNVK28ekcs");
+        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", RCExecMain.exec("pass email/SvcEmail@rencap.com"));
         service.setCredentials(creds);
         //service.autodiscoverUrl("SvcEmail@rencap.com");
         //service.setTraceEnabled(true);
@@ -106,7 +112,7 @@ public class RCMailMain {
     public static String sendСсAttach(String to, String cc, String subject, Node body, String attach) throws Exception {
         ExchangeService service = new ExchangeService();
         service.setTraceEnabled(true);
-        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", "JNVK28ekcs");
+        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", RCExecMain.exec("pass email/SvcEmail@rencap.com"));
         service.setCredentials(creds);
         //service.autodiscoverUrl("SvcEmail@rencap.com");
         //service.setTraceEnabled(true);
@@ -186,7 +192,7 @@ public class RCMailMain {
     public static String sendCc(String to, String cc, String subject, Node body) throws Exception {
         ExchangeService service = new ExchangeService();
         service.setTraceEnabled(true);
-        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", "JNVK28ekcs");
+        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", RCExecMain.exec("pass email/SvcEmail@rencap.com"));
         service.setCredentials(creds);
         //service.autodiscoverUrl("SvcEmail@rencap.com");
         //service.setTraceEnabled(true);
@@ -234,10 +240,51 @@ public class RCMailMain {
         props.setProperty("mail.imaps.sasl.authorizationid", "MurexSupportShared");
         Session session = Session.getInstance(props);
         Store store = session.getStore("smtps");
-        store.connect("outlook.office365.com", 993, "SvcEmail@rencap.com", "JNVK28ekcs");
+        store.connect("outlook.office365.com", 993, "SvcEmail@rencap.com", RCExecMain.exec("pass email/SvcEmail@rencap.com"));
     } */
 
-    public static String sendShare(String from, String pass, String shared, String to, String subject, Node body) throws Exception {
+    public static String sendShare(String shared, String to, String subject, Node body) throws Exception {
+        ExchangeService service = new ExchangeService();
+        service.setTraceEnabled(true);
+        ExchangeCredentials creds = new WebCredentials("SvcEmail@rencap.com", RCExecMain.exec("pass email/SvcEmail@rencap.com"));
+        service.setCredentials(creds);
+        //service.autodiscoverUrl("SvcEmail@rencap.com");
+        //service.setTraceEnabled(true);
+        service.setUrl(URI.create("https://outlook.office365.com/EWS/Exchange.asmx"));
+
+        try {
+            EmailMessage msg = new EmailMessage(service);
+            msg.setFrom(new EmailAddress(shared));
+            String[] toList = to.split(";");
+
+            for (int i = 0; i < toList.length; i++) {
+                msg.getToRecipients().add(toList[i]);
+            }
+
+            msg.setSubject(subject);
+            msg.setBody(new MessageBody(RCMailMain.nodeToString(body)));
+
+            /*
+            if (attach != "") {
+                String[] attachList = attach.split(";");
+                for (int i = 0; i < attachList.length; i++) {
+                    msg.getAttachments().addFileAttachment(attachList[i]);
+                }
+            }
+            */
+
+            Mailbox box = new Mailbox();
+            box.setAddress(shared);
+
+            msg.send();
+            // msg.send();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "sended";
+    }
+
+    public static String sendShare1(String from, String pass, String shared, String to, String subject, Node body) throws Exception {
         ExchangeService service = new ExchangeService();
         service.setTraceEnabled(true);
         ExchangeCredentials creds = new WebCredentials(from, pass);
@@ -279,14 +326,12 @@ public class RCMailMain {
     }
 
 
-
+    /*
     public static String sendShareSave(String from, String pass, String shared, String to, String subject, Node body) throws Exception {
         ExchangeService service = new ExchangeService();
         service.setTraceEnabled(true);
         ExchangeCredentials creds = new WebCredentials(from, pass);
         service.setCredentials(creds);
-        //service.autodiscoverUrl("SvcEmail@rencap.com");
-        //service.setTraceEnabled(true);
         service.setUrl(URI.create("https://outlook.office365.com/EWS/Exchange.asmx"));
 
         try {
@@ -301,24 +346,16 @@ public class RCMailMain {
             msg.setSubject(subject);
             msg.setBody(new MessageBody(RCMailMain.nodeToString(body)));
 
-            /*
-            if (attach != "") {
-                String[] attachList = attach.split(";");
-                for (int i = 0; i < attachList.length; i++) {
-                    msg.getAttachments().addFileAttachment(attachList[i]);
-                }
-            }
-            */
-
             Mailbox box = new Mailbox();
             box.setAddress(shared);
 
             msg.sendAndSaveCopy(new FolderId(WellKnownFolderName.SentItems, box));
-            // msg.send();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return "sended";
     }
+
+     */
 
 }
